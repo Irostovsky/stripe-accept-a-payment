@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     alert('Please set your Stripe publishable API key in the .env file');
   }
 
+  const {guestEmail} = await fetch('/guest-email').then((r) => r.json());
+  console.log(guestEmail)
+
   const stripe = Stripe(publishableKey, {
     apiVersion: '2020-08-27',
   });
@@ -31,16 +34,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   const paymentElement = elements.create('payment');
   paymentElement.mount('#payment-element');
   // Create and mount the linkAuthentication Element to enable autofilling customer payment details
-  const linkAuthenticationElement = elements.create("linkAuthentication");
+  const linkAuthenticationElement = elements.create("linkAuthentication", {
+    defaultValues: {
+      email: guestEmail,
+    }
+  });
+  // const linkAuthenticationElement = elements.create("linkAuthentication", {defaultValues: {email: "foo@bar.com"}});
   linkAuthenticationElement.mount("#link-authentication-element");
   // If the customer's email is known when the page is loaded, you can
   // pass the email to the linkAuthenticationElement on mount:
   //
-  //   linkAuthenticationElement.mount("#link-authentication-element",  {
-  //     defaultValues: {
-  //       email: 'jenny.rosen@example.com',
-  //     }
-  //   })
+  // linkAuthenticationElement.mount("#link-authentication-element",  {
+  //   defaultValues: {
+  //     email: "guestEmail@test.com",
+  //   }
+  // })
   // If you need access to the email address entered:
   //
   //  linkAuthenticationElement.on('change', (event) => {

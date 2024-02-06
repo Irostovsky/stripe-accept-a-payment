@@ -29,6 +29,9 @@ def get_root():
 def get_config():
     return jsonify({'publishableKey': os.getenv('STRIPE_PUBLISHABLE_KEY')})
 
+@app.route('/guest-email', methods=['GET'])
+def get_guest_email():
+    return jsonify({'guestEmail': 'ivan.rostovsky@guestready.com'})
 
 @app.route('/create-payment-intent', methods=['GET'])
 def create_payment():
@@ -41,9 +44,10 @@ def create_payment():
         intent = stripe.PaymentIntent.create(
             amount=1999,
             currency='EUR',
-            automatic_payment_methods={
-                'enabled': True,
-            }
+            # automatic_payment_methods={
+            #     'enabled': True,
+            # }
+            payment_method_types=["card", "link", 'paypal', 'klarna'],
         )
 
         # Send PaymentIntent details to the front end.
@@ -85,6 +89,9 @@ def webhook_received():
         print('❌ Payment failed.')
     return jsonify({'status': 'success'})
 
+@app.route('/.well-known/apple-developer-merchantid-domain-association')
+def send_report():
+    return send_from_directory('', 'apple-developer-merchantid-domain-association')
 
 if __name__ == '__main__':
     app.run(port=4242, debug=True)
